@@ -1,6 +1,7 @@
 .qmake.stash
 Makefile
 *.o
+*.user
 libv_repExtRemoteApi.1.0.0.dylib
 libv_repExtRemoteApi.1.0.dylib
 libv_repExtRemoteApi.1.dylib
