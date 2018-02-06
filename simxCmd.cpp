@@ -1492,7 +1492,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
 
     	case simx_cmd_call_script_function:
         {
-            int options=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
+            int scriptHandleOrType=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             std::string scriptDescription(_cmdString);
             std::string functionName(_cmdString2);
             std::vector<int> inInt;
@@ -1540,46 +1540,53 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                 functionName+=scriptDescription;
             }
 
-            if (simCallScriptFunctionEx(options,functionName.c_str(),stack)!=-1)
-            { // success!
-                // Now check the return arguments:
-                const int outArgs[]={4,sim_script_arg_int32|sim_script_arg_table,0,sim_script_arg_float|sim_script_arg_table,0,sim_script_arg_string|sim_script_arg_table,0,sim_script_arg_charbuff,0};
+            if ( (simGetSimulationState()!=sim_simulation_stopped)||(scriptHandleOrType==sim_scripttype_customizationscript) )
+            {
+                if (simCallScriptFunctionEx(scriptHandleOrType,functionName.c_str(),stack)!=-1)
+                { // success!
+                    // Now check the return arguments:
+                    const int outArgs[]={4,sim_script_arg_int32|sim_script_arg_table,0,sim_script_arg_float|sim_script_arg_table,0,sim_script_arg_string|sim_script_arg_table,0,sim_script_arg_charbuff,0};
 
-                if (D.readDataFromStack_scriptFunctionCall(stack,outArgs,outArgs[0],functionName.c_str()))
-                {
-                    std::vector<CScriptFunctionDataItem>* outData=D.getOutDataPtr_scriptFunctionCall();
-                    int outIntCnt=(int)outData->at(0).int32Data.size();
-                    int outFloatCnt=(int)outData->at(1).floatData.size();
-                    int outStringCnt=(int)outData->at(2).stringData.size();
-                    int outBufferSize=(int)outData->at(3).stringData[0].size();
-                    std::string retData;
-                    appendIntToString(retData,outIntCnt,false,otherSideIsBigEndian);
-                    appendIntToString(retData,outFloatCnt,false,otherSideIsBigEndian);
-                    appendIntToString(retData,outStringCnt,false,otherSideIsBigEndian);
-                    appendIntToString(retData,outBufferSize,false,otherSideIsBigEndian);
-                    for (int i=0;i<outIntCnt;i++)
-                        appendIntToString(retData,outData->at(0).int32Data[i],true,otherSideIsBigEndian);
-                    for (int i=0;i<outFloatCnt;i++)
-                        appendFloatToString(retData,outData->at(1).floatData[i],true,otherSideIsBigEndian);
-                    for (int i=0;i<outStringCnt;i++)
+                    if (D.readDataFromStack_scriptFunctionCall(stack,outArgs,outArgs[0],functionName.c_str()))
                     {
-                        retData+=std::string(outData->at(2).stringData[i].c_str()); // make sure we don't have embedded zeros, otherwise trouble!
-                        retData+='\0';
+                        std::vector<CScriptFunctionDataItem>* outData=D.getOutDataPtr_scriptFunctionCall();
+                        int outIntCnt=(int)outData->at(0).int32Data.size();
+                        int outFloatCnt=(int)outData->at(1).floatData.size();
+                        int outStringCnt=(int)outData->at(2).stringData.size();
+                        int outBufferSize=(int)outData->at(3).stringData[0].size();
+                        std::string retData;
+                        appendIntToString(retData,outIntCnt,false,otherSideIsBigEndian);
+                        appendIntToString(retData,outFloatCnt,false,otherSideIsBigEndian);
+                        appendIntToString(retData,outStringCnt,false,otherSideIsBigEndian);
+                        appendIntToString(retData,outBufferSize,false,otherSideIsBigEndian);
+                        for (int i=0;i<outIntCnt;i++)
+                            appendIntToString(retData,outData->at(0).int32Data[i],true,otherSideIsBigEndian);
+                        for (int i=0;i<outFloatCnt;i++)
+                            appendFloatToString(retData,outData->at(1).floatData[i],true,otherSideIsBigEndian);
+                        for (int i=0;i<outStringCnt;i++)
+                        {
+                            retData+=std::string(outData->at(2).stringData[i].c_str()); // make sure we don't have embedded zeros, otherwise trouble!
+                            retData+='\0';
+                        }
+                        retData+=outData->at(3).stringData[0];
+                        retCmd->setDataReply_custom_copyBuffer(&retData[0],int(retData.length()),true);
+                        success=true;
                     }
-                    retData+=outData->at(3).stringData[0];
-                    retCmd->setDataReply_custom_copyBuffer(&retData[0],int(retData.length()),true);
-                    success=true;
+                    else
+                    {
+                        functionName="simCallScriptFunctionEx on "+functionName;
+                        simSetLastError(functionName.c_str(),"Function didn't produce expected return values, i.e. an int table, a float table, a string table and a buffer string.");
+                    }
                 }
                 else
                 {
                     functionName="simCallScriptFunctionEx on "+functionName;
-                    simSetLastError(functionName.c_str(),"Function didn't produce expected return values, i.e. an int table, a float table, a string table and a buffer string.");
+                    simSetLastError(functionName.c_str(),"Call failed.");
                 }
             }
             else
-            {
-                functionName="simCallScriptFunctionEx on "+functionName;
-                simSetLastError(functionName.c_str(),"Call failed.");
+            { // trying to call a simulation script's function while simulation is not running
+                // silent error here
             }
             simReleaseStack(stack);
 
