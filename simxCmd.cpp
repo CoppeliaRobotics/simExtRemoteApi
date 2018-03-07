@@ -731,10 +731,10 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
             if (simGetVisionSensorResolution(handle,res)!=-1)
             {
                 int bytesPerPixel;
-                if(_rawCmdID == simx_cmd_get_vision_sensor_image_bw) {
+                if(_rawCmdID == simx_cmd_set_vision_sensor_image_bw) {
                     bytesPerPixel=1;
                 }
-            	if(_rawCmdID == simx_cmd_get_vision_sensor_image_rgb) {
+                if(_rawCmdID == simx_cmd_set_vision_sensor_image_rgb) {
                     bytesPerPixel=3;
                 }
                 if (res[0]*res[1]*bytesPerPixel==_pureDataSize)
