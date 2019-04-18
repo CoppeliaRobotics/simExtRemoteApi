@@ -87,41 +87,35 @@ CInConnection::~CInConnection()
         if (_newVersion)
         {
             #ifdef _WIN32
-                if (_local_socket != -1)
+                if (_accepted_socket>=0)
+                    shutdown(_accepted_socket, 2);
+               if (_local_socket>=0)
                     closesocket(_local_socket);
-                if (_accepted_socket != -1)
-                    shutdown(_accepted_socket, 2); //SD_BOTH
-
                 WSACleanup();
             #endif /* _WIN32 */
 
             #if defined (__linux) || defined (__APPLE__)
-                if (_local_socket !=-1)
-                    close(_local_socket);
-                if (_accepted_socket !=-1)
+                if (_accepted_socket>=0)
                     close(_accepted_socket);
+                if (_local_socket>=0)
+                    close(_local_socket);
             #endif /* __linux || __APPLE__ */
         }
         else
         {
-            if (_connected)
-            {
-                #ifdef _WIN32
-                    shutdown(_socketClient,2); //SD_BOTH
+            #ifdef _WIN32
+                if (_socketClient>=0)
+                    shutdown(_socketClient,2);
+                if (_socketServer>=0)
                     closesocket(_socketServer);
-                    WSACleanup();
-                #endif /* _WIN32 */
-                #if defined (__linux) || defined (__APPLE__)
-                    if (_socketServer!=-1)
-                    {
-                        close(_socketServer);
-                    }
-                    if (_socketClient!=-1)
-                    {
-                        close(_socketClient);
-                    }
-                #endif /* __linux || __APPLE__ */
-            }
+                WSACleanup();
+            #endif /* _WIN32 */
+            #if defined (__linux) || defined (__APPLE__)
+                if (_socketClient>=0)
+                    close(_socketClient);
+                if (_socketServer>=0)
+                    close(_socketServer);
+            #endif /* __linux || __APPLE__ */
         }
     }
 }
@@ -235,6 +229,8 @@ bool CInConnection::connectToClient()
         }
         else
         {
+            _socketServer=-1;
+            _socketClient=-1;
             #ifdef _WIN32
                 // 1. connect to port:
                 if (WSAStartup(0x101,&_socketWsaData)!=0)
