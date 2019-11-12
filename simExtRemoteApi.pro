@@ -1,7 +1,7 @@
 QT -= core
 QT -= gui
 
-TARGET = v_repExtRemoteApi
+TARGET = simExtRemoteApi
 TEMPLATE = lib
 
 DEFINES -= UNICODE
@@ -35,24 +35,24 @@ INCLUDEPATH += "../include"
 
 
 win32 {
-    DEFINES += WIN_VREP
+    DEFINES += WIN_SIM
     LIBS += -lwinmm
     LIBS += -lWs2_32
     LIBS += -lKernel32
 }
 
 macx {
-    DEFINES += MAC_VREP
+    DEFINES += MAC_SIM
 #    LIBS += -lrt
 }
 
 unix:!macx {
-    DEFINES += LIN_VREP
+    DEFINES += LIN_SIM
     LIBS += -lrt
 }
 
 SOURCES += \
-    v_repExtRemoteApi.cpp \
+    simExtRemoteApi.cpp \
     confReader.cpp \
     inConnection.cpp \
     porting.cpp \
@@ -64,10 +64,10 @@ SOURCES += \
     ../common/scriptFunctionData.cpp \
     ../common/scriptFunctionDataItem.cpp \
     ../common/shared_memory.c \
-    ../common/v_repLib.cpp \
+    ../common/simLib.cpp \
 
 HEADERS +=\
-    v_repExtRemoteApi.h \
+    simExtRemoteApi.h \
     confReader.h \
     inConnection.h \
     porting.h \
@@ -79,7 +79,7 @@ HEADERS +=\
     ../include/scriptFunctionData.h \
     ../include/scriptFunctionDataItem.h \
     ../include/shared_memory.h \
-    ../include/v_repLib.h \
+    ../include/simLib.h \
 
 unix:!symbian {
     maemo5 {

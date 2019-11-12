@@ -1,6 +1,6 @@
-#include "v_repExtRemoteApi.h"
+#include "simExtRemoteApi.h"
 #include "scriptFunctionData.h"
-#include "v_repLib.h"
+#include "simLib.h"
 #include <iostream>
 #include "simxConnections.h"
 #include "confReader.h"
@@ -23,7 +23,7 @@
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)    CONCAT(x,y,z)
 
-LIBRARY vrepLib;
+LIBRARY simLib;
 CSimxConnections allConnections;
 
 // --------------------------------------------------------------------------------------
@@ -230,9 +230,9 @@ void LUA_STATUS_CALLBACK(SScriptCallBack* p)
 
 
 // This is the plugin start routine:
-VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
-{ // This is called just once, at the start of V-REP
-    // Dynamically load and bind V-REP functions:
+SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
+{ // This is called just once, at the start of CoppeliaSim
+    // Dynamically load and bind CoppeliaSim functions:
     char curDirAndFile[1024];
 #ifdef _WIN32
     #ifdef QT_COMPIL
@@ -249,33 +249,33 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
     std::string temp(currentDirAndPath);
 
 #ifdef _WIN32
-    temp+="\\v_rep.dll";
+    temp+="\\coppeliaSim.dll";
 #elif defined (__linux)
-    temp+="/libv_rep.so";
+    temp+="/libcoppeliaSim.so";
 #elif defined (__APPLE__)
-    temp+="/libv_rep.dylib";
+    temp+="/libcoppeliaSim.dylib";
 #endif /* __linux || __APPLE__ */
 
-    vrepLib=loadVrepLibrary(temp.c_str());
-    if (vrepLib==NULL)
+    simLib=loadSimLibrary(temp.c_str());
+    if (simLib==NULL)
     {
-        std::cout << "Error, could not find or correctly load the V-REP library. Cannot start 'RemoteApi' plugin.\n";
-        return(0); // Means error, V-REP will unload this plugin
+        std::cout << "Error, could not find or correctly load the CoppeliaSim library. Cannot start 'RemoteApi' plugin.\n";
+        return(0); // Means error, CoppeliaSim will unload this plugin
     }
-    if (getVrepProcAddresses(vrepLib)==0)
+    if (getSimProcAddresses(simLib)==0)
     {
-        std::cout << "Error, could not find all required functions in the V-REP library. Cannot start 'RemoteApi' plugin.\n";
-        unloadVrepLibrary(vrepLib);
-        return(0); // Means error, V-REP will unload this plugin
+        std::cout << "Error, could not find all required functions in the CoppeliaSim library. Cannot start 'RemoteApi' plugin.\n";
+        unloadSimLibrary(simLib);
+        return(0); // Means error, CoppeliaSim will unload this plugin
     }
 
-    int vrepVer,vrepRev;
-    simGetIntegerParameter(sim_intparam_program_version,&vrepVer);
-    simGetIntegerParameter(sim_intparam_program_revision,&vrepRev);
-    if( (vrepVer<30400) || ((vrepVer==30400)&&(vrepRev<9)) )
+    int simVer,simRev;
+    simGetIntegerParameter(sim_intparam_program_version,&simVer);
+    simGetIntegerParameter(sim_intparam_program_revision,&simRev);
+    if( (simVer<30400) || ((simVer==30400)&&(simRev<9)) )
     {
-        std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.4.0 rev9 or higher is required. Cannot start 'RemoteApi' plugin.\n";
-        unloadVrepLibrary(vrepLib);
+        std::cout << "Sorry, your CoppeliaSim copy is somewhat old, CoppeliaSim 3.4.0 rev9 or higher is required. Cannot start 'RemoteApi' plugin.\n";
+        unloadSimLibrary(simLib);
         return(0);
     }
 
@@ -427,15 +427,15 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 }
 
 // This is the plugin end routine:
-VREP_DLLEXPORT void v_repEnd()
-{ // This is called just once, at the end of V-REP
+SIM_DLLEXPORT void simEnd()
+{ // This is called just once, at the end of CoppeliaSim
     allConnections.removeAllConnections();
 
-    unloadVrepLibrary(vrepLib); // release the library
+    unloadSimLibrary(simLib); // release the library
 }
 
-// This is the plugin messaging routine (i.e. V-REP calls this function very often, with various messages):
-VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customData,int* replyData)
+// This is the plugin messaging routine (i.e. CoppeliaSim calls this function very often, with various messages):
+SIM_DLLEXPORT void* simMessage(int message,int* auxiliaryData,void* customData,int* replyData)
 { // This is called quite often. Just watch out for messages/events you want to handle
 
     // This function should not generate any error messages:
@@ -455,7 +455,7 @@ VREP_DLLEXPORT void* v_repMessage(int message,int* auxiliaryData,void* customDat
         if (allConnections.thereWasARequestToCallTheMainScript())
         {
             simSetBooleanParameter(sim_boolparam_waiting_for_trigger,1); // the remote API client can query that value
-            replyData[0]=0; // this tells V-REP that we don't wanna execute the main script
+            replyData[0]=0; // this tells CoppeliaSim that we don't wanna execute the main script
         }
         else
         {

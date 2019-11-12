@@ -1,6 +1,6 @@
 #include "simxCmd.h"
 #include "simxUtils.h"
-#include "v_repLib.h"
+#include "simLib.h"
 #include "simxSocket.h"
 #include "scriptFunctionData.h"
 #include <stdio.h>

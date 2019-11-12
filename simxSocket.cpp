@@ -1,6 +1,6 @@
 #include "simxSocket.h"
 #include "simxUtils.h"
-#include "v_repLib.h"
+#include "simLib.h"
 #include <iostream>
 #include <sstream>
 
@@ -75,7 +75,7 @@ bool CSimxSocket::getWaitForTrigger()
     simGetIntegerParameter(sim_intparam_program_version,&ver);
     int req;
     simGetIntegerParameter(sim_intparam_stop_request_counter,&req);
-    if ((req!=_stopSimulationRequestCounter)&&(ver>=30006)) // stop in stepped mode only supported from V-REP 3.0.6 on!
+    if ((req!=_stopSimulationRequestCounter)&&(ver>=30006)) // stop in stepped mode only supported from CoppeliaSim 3.0.6 on!
     {
         _waitForTrigger=false;
         _waitForTriggerFunctionEnabled=false;
@@ -367,7 +367,7 @@ void* CSimxSocket::_run()
     {
         connection=new CInConnection(_portNb,_maxPacketSize,useAlternateSocketRoutines);
         if (_debug)
-        { // We do this in a funny way since we should not access V-REP from a thread not created in V-REP!
+        { // We do this in a funny way since we should not access CoppeliaSim from a thread not created in CoppeliaSim!
             _lock();
             _textToPrintToConsole.push_back("connecting to client...\n");
             _unlock();
@@ -383,7 +383,7 @@ void* CSimxSocket::_run()
             _unlock();
             int _lastLastReceivedMessage_time=0;
             if (_debug)
-            { // We do this in a funny way since we should not access V-REP from a thread not created in V-REP!
+            { // We do this in a funny way since we should not access CoppeliaSim from a thread not created in CoppeliaSim!
                 _lock(); // we are not locked here!
                 _textToPrintToConsole.push_back("connected to client.\n");
                 _unlock();
@@ -418,7 +418,7 @@ void* CSimxSocket::_run()
                         _receivedCommands->setMessageID(messageID);
                         _receivedCommands->setDataTimeStamp(timeStamp);
                         if (_debug)
-                        { // We do this in a funny way since we should not access V-REP from a thread not created in V-REP!
+                        { // We do this in a funny way since we should not access CoppeliaSim from a thread not created in CoppeliaSim!
                             // resources are already locked here, no need to lock a second time!
                             std::stringstream strStream;
                             strStream << "data received: " << dataSize << " bytes (message ID = " << messageID << ")\n";
@@ -460,7 +460,7 @@ void* CSimxSocket::_run()
                     else
                     {
                         if (_debug)
-                        { // We do this in a funny way since we should not access V-REP from a thread not created in V-REP!
+                        { // We do this in a funny way since we should not access CoppeliaSim from a thread not created in CoppeliaSim!
                             // resources are already locked here, no need to lock a second time!
                             _textToPrintToConsole.push_back("data received: error (crc failed)\n");
                         }
@@ -485,7 +485,7 @@ void* CSimxSocket::_run()
                     {
 //printf("Write NOT successful!\n");
                         if (_debug)
-                        { // We do this in a funny way since we should not access V-REP from a thread not created in V-REP!
+                        { // We do this in a funny way since we should not access CoppeliaSim from a thread not created in CoppeliaSim!
                             _lock(); // important to lock resources!
                             _textToPrintToConsole.push_back("failed sending reply.\n");
                             _unlock();
@@ -497,7 +497,7 @@ void* CSimxSocket::_run()
 //printf("Write successful!\n");
                         _lastSentMessage_time=getTimeInMs();
                         if (_debug)
-                        { // We do this in a funny way since we should not access V-REP from a thread not created in V-REP!
+                        { // We do this in a funny way since we should not access CoppeliaSim from a thread not created in CoppeliaSim!
                             _lock(); // important to lock resources!
                             std::stringstream strStream;
                             strStream << "reply sent: " << replyData.size() << " bytes (message ID = " << messageIdToSend << ", stream cmd cnt = " << streamCmdCnt << ")\n";
@@ -515,7 +515,7 @@ void* CSimxSocket::_run()
                     // if (dataSize==-1)
                     {
                         if (_debug)
-                        { // We do this in a funny way since we should not access V-REP from a thread not created in V-REP!
+                        { // We do this in a funny way since we should not access CoppeliaSim from a thread not created in CoppeliaSim!
                             _lock(); // important to lock resources!
                             _textToPrintToConsole.push_back("error while receiving data.\n");
                             _unlock();
@@ -525,7 +525,7 @@ void* CSimxSocket::_run()
                 }
             }
             if (_debug)
-            { // We do this in a funny way since we should not access V-REP from a thread not created in V-REP!
+            { // We do this in a funny way since we should not access CoppeliaSim from a thread not created in CoppeliaSim!
                 _lock(); // important to lock resources!
                 _textToPrintToConsole.push_back("disconnected from client.\n");
                 _unlock();
@@ -543,7 +543,7 @@ void* CSimxSocket::_run()
 //printf("Failed connecting!\n");
             Sleep(2000); // 13/12/2013
             if (_debug)
-            { // We do this in a funny way since we should not access V-REP from a thread not created in V-REP!
+            { // We do this in a funny way since we should not access CoppeliaSim from a thread not created in CoppeliaSim!
                 _lock(); // important to lock resources!
                 _textToPrintToConsole.push_back("failed connecting to client.\n");
                 _unlock();
@@ -611,7 +611,7 @@ void CSimxSocket::instancePass()
     }
 
     if (_debug)
-    { // we should never access the V-REP API from a thread not created in V-REP!
+    { // we should never access the CoppeliaSim API from a thread not created in CoppeliaSim!
         _lock();
         for (unsigned int i=0;i<_textToPrintToConsole.size();i++)
             simAuxiliaryConsolePrint(_auxConsoleHandle,_textToPrintToConsole[i].c_str());

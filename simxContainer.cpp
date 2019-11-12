@@ -1,6 +1,6 @@
 #include "simxContainer.h"
 #include "simxUtils.h"
-#include "v_repLib.h"
+#include "simLib.h"
 
 CSimxContainer::CSimxContainer(bool isInputContainer)
 {
