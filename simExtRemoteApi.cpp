@@ -23,8 +23,21 @@
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)    CONCAT(x,y,z)
 
-LIBRARY simLib;
-CSimxConnections allConnections;
+static LIBRARY simLib;
+static CSimxConnections allConnections;
+
+bool canOutputMsg(int msgType)
+{
+    int plugin_verbosity = sim_verbosity_default;
+    simGetModuleInfo("RemoteApi",sim_moduleinfo_verbosity,nullptr,&plugin_verbosity);
+    return(plugin_verbosity>=msgType);
+}
+
+void outputMsg(int msgType,const char* msg)
+{
+    if (canOutputMsg(msgType))
+        printf("%s\n",msg);
+}
 
 // --------------------------------------------------------------------------------------
 // simExtRemoteApiStart
@@ -259,24 +272,14 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
     simLib=loadSimLibrary(temp.c_str());
     if (simLib==NULL)
     {
-        std::cout << "Error, could not find or correctly load the CoppeliaSim library. Cannot start 'RemoteApi' plugin.\n";
+        outputMsg(sim_verbosity_errors,"simExtRemoteApi plugin error: could not find or correctly load the CoppeliaSim library. Cannot start 'RemoteApi' plugin.");
         return(0); // Means error, CoppeliaSim will unload this plugin
     }
     if (getSimProcAddresses(simLib)==0)
     {
-        std::cout << "Error, could not find all required functions in the CoppeliaSim library. Cannot start 'RemoteApi' plugin.\n";
+        outputMsg(sim_verbosity_errors,"simExtRemoteApi plugin error: could not find all required functions in the CoppeliaSim library. Cannot start 'RemoteApi' plugin.");
         unloadSimLibrary(simLib);
         return(0); // Means error, CoppeliaSim will unload this plugin
-    }
-
-    int simVer,simRev;
-    simGetIntegerParameter(sim_intparam_program_version,&simVer);
-    simGetIntegerParameter(sim_intparam_program_revision,&simRev);
-    if( (simVer<30400) || ((simVer==30400)&&(simRev<9)) )
-    {
-        std::cout << "Sorry, your CoppeliaSim copy is somewhat old, CoppeliaSim 3.4.0 rev9 or higher is required. Cannot start 'RemoteApi' plugin.\n";
-        unloadSimLibrary(simLib);
-        return(0);
     }
 
     simRegisterScriptVariable("simRemoteApi","require('simExtRemoteApi')",0);
@@ -356,10 +359,14 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
                 CSimxSocket* oneSocketConnection=new CSimxSocket(portNb,true,false,debug,maxPacketSize,synchronousTrigger);
                 oneSocketConnection->start();
                 allConnections.addSocketConnection(oneSocketConnection);
-                std::cout << "Starting a remote API server on port " << portNb << std::endl;
+                if (canOutputMsg(sim_verbosity_loadinfos))
+                    std::cout << "simExtRemoteApi plugin loadinfo: starting a remote API server on port " << portNb << std::endl;
             }
             else
-                std::cout << "Failed starting a remote API server on port " << portNb << std::endl;
+            {
+                if (canOutputMsg(sim_verbosity_errors))
+                    std::cout << "simExtRemoteApi plugin error: failed starting a remote API server on port " << portNb << std::endl;
+            }
             index++;
         }
         else
@@ -414,10 +421,14 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
                         CSimxSocket* oneSocketConnection=new CSimxSocket(portNb,true,false,debug,maxPacketSize,syncTrigger);
                         oneSocketConnection->start();
                         allConnections.addSocketConnection(oneSocketConnection);
-                        std::cout << "Starting a remote API server on port " << portNb << std::endl;
+                        if (canOutputMsg(sim_verbosity_loadinfos))
+                            std::cout << "simExtRemoteApi plugin loadinfo: starting a remote API server on port " << portNb << std::endl;
                     }
                     else
-                        std::cout << "Failed starting a remote API server on port " << portNb << std::endl;
+                    {
+                        if (canOutputMsg(sim_verbosity_errors))
+                            std::cout << "simExtRemoteApi plugin error: failed starting a remote API server on port " << portNb << std::endl;
+                    }
                 }
             }
         }
