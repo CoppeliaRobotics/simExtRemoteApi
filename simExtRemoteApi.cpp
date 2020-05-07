@@ -272,12 +272,12 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
     simLib=loadSimLibrary(temp.c_str());
     if (simLib==NULL)
     {
-        outputMsg(sim_verbosity_errors,"simExtRemoteApi plugin error: could not find or correctly load the CoppeliaSim library. Cannot start 'RemoteApi' plugin.");
+        outputMsg(sim_verbosity_errors,"simExtRemoteApi: error: could not find or correctly load the CoppeliaSim library. Cannot start 'RemoteApi' plugin.");
         return(0); // Means error, CoppeliaSim will unload this plugin
     }
     if (getSimProcAddresses(simLib)==0)
     {
-        outputMsg(sim_verbosity_errors,"simExtRemoteApi plugin error: could not find all required functions in the CoppeliaSim library. Cannot start 'RemoteApi' plugin.");
+        outputMsg(sim_verbosity_errors,"simExtRemoteApi: error: could not find all required functions in the CoppeliaSim library. Cannot start 'RemoteApi' plugin.");
         unloadSimLibrary(simLib);
         return(0); // Means error, CoppeliaSim will unload this plugin
     }
@@ -360,12 +360,12 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
                 oneSocketConnection->start();
                 allConnections.addSocketConnection(oneSocketConnection);
                 if (canOutputMsg(sim_verbosity_loadinfos))
-                    std::cout << "simExtRemoteApi plugin loadinfo: starting a remote API server on port " << portNb << std::endl;
+                    std::cout << "simExtRemoteApi: loadinfo: starting a remote API server on port " << portNb << std::endl;
             }
             else
             {
                 if (canOutputMsg(sim_verbosity_errors))
-                    std::cout << "simExtRemoteApi plugin error: failed starting a remote API server on port " << portNb << std::endl;
+                    std::cout << "simExtRemoteApi: error: failed starting a remote API server on port " << portNb << std::endl;
             }
             index++;
         }
@@ -422,12 +422,12 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
                         oneSocketConnection->start();
                         allConnections.addSocketConnection(oneSocketConnection);
                         if (canOutputMsg(sim_verbosity_loadinfos))
-                            std::cout << "simExtRemoteApi plugin loadinfo: starting a remote API server on port " << portNb << std::endl;
+                            std::cout << "simExtRemoteApi: loadinfo: starting a remote API server on port " << portNb << std::endl;
                     }
                     else
                     {
                         if (canOutputMsg(sim_verbosity_errors))
-                            std::cout << "simExtRemoteApi plugin error: failed starting a remote API server on port " << portNb << std::endl;
+                            std::cout << "simExtRemoteApi: error: failed starting a remote API server on port " << portNb << std::endl;
                     }
                 }
             }
