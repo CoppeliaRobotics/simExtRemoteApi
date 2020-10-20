@@ -81,7 +81,7 @@ void LUA_START_CALLBACK(SScriptCallBack* p)
             int prop,obj;
             if (-1!=simGetScriptProperty(p->scriptID,&prop,&obj))
             {
-                int scriptType=((prop|sim_scripttype_threaded)-sim_scripttype_threaded);
+                int scriptType=((prop|sim_scripttype_threaded_old)-sim_scripttype_threaded_old);
                 bool destroyAtSimulationEnd=( (scriptType==sim_scripttype_mainscript)||(scriptType==sim_scripttype_childscript) );
                 CSimxSocket* oneSocketConnection=new CSimxSocket(port,false,destroyAtSimulationEnd,debug,maxPacketSize,triggerPreEnabled); // 3/3/2014
                 oneSocketConnection->start();
