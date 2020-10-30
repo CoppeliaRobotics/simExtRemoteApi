@@ -459,7 +459,7 @@ int CInConnection::_receiveSimplePacket(std::vector<char>& packet)
     }
     else
     {
-        _socketTimeOut.tv_sec=10; // 1 second max between successive receive for the same packet
+        _socketTimeOut.tv_sec=SOCKET_TIMEOUT_READ/1000; // x second max between successive receive for the same packet
         _socketTimeOut.tv_usec=0;
         FD_ZERO(&_socketTheSet);
         FD_SET(_socketClient,&_socketTheSet);
