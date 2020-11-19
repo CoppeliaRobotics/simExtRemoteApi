@@ -1733,6 +1733,26 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
             retCmd->setDataReply_1float(dist,success,otherSideIsBigEndian);
         }
         break;
+		
+        case simx_cmd_check_collision:
+        {
+            int entity1=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
+            int entity2=littleEndianIntConversion(((int*)(_cmdData+0))[1],otherSideIsBigEndian);
+            int res=simCheckCollision(entity1,entity2);
+            bool success=(res!=-1);
+            retCmd->setDataReply_1int(res,success,otherSideIsBigEndian);
+        }
+        break;
+
+        case simx_cmd_check_distance:
+        {
+            int entity1=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
+            int entity2=littleEndianIntConversion(((int*)(_cmdData+0))[1],otherSideIsBigEndian);
+            float dist=0.0f;
+            bool success=(simCheckDistance(entity1,entity2,0.0f,&dist)!=-1);
+            retCmd->setDataReply_1float(dist,success,otherSideIsBigEndian);
+        }
+        break;
 
         case simx_cmd_remove_object:
         {
