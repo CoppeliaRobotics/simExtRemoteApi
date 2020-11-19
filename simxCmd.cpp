@@ -1712,6 +1712,11 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         {
             int handle=simGetCollectionHandle(_cmdString.c_str());
             bool success=(handle!=-1);
+			if (!success)
+			{ // convenience functionality. New collections do not have any name
+				int res=simGetIntegerSignal(_cmdString.c_str(),&handle);
+				success=(res>0);
+			}
             retCmd->setDataReply_1int(handle,success,otherSideIsBigEndian);
         }
         break;
