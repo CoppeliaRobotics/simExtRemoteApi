@@ -293,10 +293,13 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
 
 #ifdef _WIN32
     temp+="\\remoteApiConnections.txt";
-#endif /* _WIN32 */
-#if defined (__linux) || defined (__APPLE__)
+#endif
+#ifdef __linux
     temp+="/remoteApiConnections.txt";
-#endif /* __linux || __APPLE__ */
+#endif
+#ifdef __APPLE__
+    temp+="../Resources/remoteApiConnections.txt";
+#endif
 
     // Read the configuration file and start remote API server services accordingly:
     conf.readConfiguration(temp.c_str());
