@@ -1267,6 +1267,22 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
             {
                 int handle=hand[i];
                 retHandles.push_back(handle);
+                if (dataType==20)
+                { // object alias
+                    char* name=simGetObjectAlias(handle,-1);
+                    retString+=name;
+                    retString+='\0';
+                    simReleaseBuffer(name);
+                    retStringCount++;
+                }
+                if (dataType==21)
+                { // object path
+                    char* name=simGetObjectAlias(handle,2);
+                    retString+=name;
+                    retString+='\0';
+                    simReleaseBuffer(name);
+                    retStringCount++;
+                }
                 if (dataType==0)
                 { // object name
                     char* name=simGetObjectName(handle);
