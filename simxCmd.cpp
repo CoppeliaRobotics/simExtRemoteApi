@@ -1769,9 +1769,9 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         {
             int entity1=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int entity2=littleEndianIntConversion(((int*)(_cmdData+0))[1],otherSideIsBigEndian);
-            float dist=0.0f;
-            bool success=(simCheckDistance(entity1,entity2,0.0f,&dist)!=-1);
-            retCmd->setDataReply_1float(dist,success,otherSideIsBigEndian);
+            float dist[7];
+            bool success=(simCheckDistance(entity1,entity2,0.0f,dist)!=-1);
+            retCmd->setDataReply_1float(dist[6],success,otherSideIsBigEndian);
         }
         break;
 
