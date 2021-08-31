@@ -269,8 +269,6 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
         return(0); // Means error, CoppeliaSim will unload this plugin
     }
 
-    simRegisterScriptVariable("simRemoteApi","require('simExtRemoteApi')",0);
-
     // Register the new Lua commands:
     simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@","RemoteApi"),strConCat("number result=",LUA_START_COMMAND,"(number socketPort,number maxPacketSize=1300,boolean debug=false,boolean preEnableTrigger=false)"),LUA_START_CALLBACK);
     simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@","RemoteApi"),strConCat("number result=",LUA_STOP_COMMAND,"(number socketPort)"),LUA_STOP_CALLBACK);
