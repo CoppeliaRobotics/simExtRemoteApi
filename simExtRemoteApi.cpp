@@ -270,10 +270,10 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
     }
 
     // Register the new Lua commands:
-    simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@","RemoteApi"),strConCat("number result=",LUA_START_COMMAND,"(number socketPort,number maxPacketSize=1300,boolean debug=false,boolean preEnableTrigger=false)"),LUA_START_CALLBACK);
-    simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@","RemoteApi"),strConCat("number result=",LUA_STOP_COMMAND,"(number socketPort)"),LUA_STOP_CALLBACK);
-    simRegisterScriptCallbackFunction(strConCat(LUA_RESET_COMMAND,"@","RemoteApi"),strConCat("number result=",LUA_RESET_COMMAND,"(number socketPort)"),LUA_RESET_CALLBACK);
-    simRegisterScriptCallbackFunction(strConCat(LUA_STATUS_COMMAND,"@","RemoteApi"),strConCat("number status,table_5 info,number version,number clientVersion,string connectedIp=",LUA_STATUS_COMMAND,"(number socketPort)"),LUA_STATUS_CALLBACK);
+    simRegisterScriptCallbackFunction(strConCat(LUA_START_COMMAND,"@","RemoteApi"),strConCat("int result=",LUA_START_COMMAND,"(int socketPort,int maxPacketSize=1300,bool debug=false,bool preEnableTrigger=false)"),LUA_START_CALLBACK);
+    simRegisterScriptCallbackFunction(strConCat(LUA_STOP_COMMAND,"@","RemoteApi"),strConCat("int result=",LUA_STOP_COMMAND,"(int socketPort)"),LUA_STOP_CALLBACK);
+    simRegisterScriptCallbackFunction(strConCat(LUA_RESET_COMMAND,"@","RemoteApi"),strConCat("int result=",LUA_RESET_COMMAND,"(int socketPort)"),LUA_RESET_CALLBACK);
+    simRegisterScriptCallbackFunction(strConCat(LUA_STATUS_COMMAND,"@","RemoteApi"),strConCat("int status,int[5] info,int version,int clientVersion,string connectedIp=",LUA_STATUS_COMMAND,"(int socketPort)"),LUA_STATUS_CALLBACK);
 
     // Following for backward compatibility:
     simRegisterScriptVariable(LUA_START_COMMANDOLD,LUA_START_COMMAND,-1);
