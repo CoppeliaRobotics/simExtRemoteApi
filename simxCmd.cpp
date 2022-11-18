@@ -711,7 +711,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                         for (int i=0;i<res[0]*res[1]*3;i++)
                             dat[8+i]=img[i];
                     }
-                    simReleaseBuffer((simChar*)img);
+                    simReleaseBuffer((char*)img);
                     retCmd->setDataReply_custom_transferBuffer(dat,4+4+res[0]*res[1]*bytesPerPixel,success);
                 }
                 else
@@ -1077,7 +1077,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                     ((int*)(dat+0))[1]=littleEndianIntConversion(res[1],otherSideIsBigEndian);
                     for (int i=0;i<res[0]*res[1];i++)
                         ((float*)dat)[2+i]=littleEndianFloatConversion(img[i],otherSideIsBigEndian);
-                    simReleaseBuffer((simChar*)img);
+                    simReleaseBuffer((char*)img);
                     retCmd->setDataReply_custom_transferBuffer(dat,4+4+res[0]*res[1]*4,success);
                 }
                 else
@@ -1443,7 +1443,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                     if (simGetObjectType(handle)==sim_object_joint_type)
                     {
                         float range[2];
-                        simBool cyclic;
+                        bool cyclic;
                         simGetJointInterval(handle,&cyclic,range);
                         if (cyclic)
                             range[1]=-1.0f;
