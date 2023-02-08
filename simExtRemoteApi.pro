@@ -8,6 +8,7 @@ DEFINES -= UNICODE
 DEFINES += QT_COMPIL
 CONFIG += shared plugin
 INCLUDEPATH += "../include"
+INCLUDEPATH += "../include/simLib"
 
 *-msvc* {
     QMAKE_CXXFLAGS += -O2
@@ -61,10 +62,10 @@ SOURCES += \
     simxContainer.cpp \
     simxSocket.cpp \
     simxUtils.cpp \
-    ../common/scriptFunctionData.cpp \
-    ../common/scriptFunctionDataItem.cpp \
-    ../common/shared_memory.c \
-    ../common/simLib.cpp \
+    ../include/simLib/scriptFunctionData.cpp \
+    ../include/simLib/scriptFunctionDataItem.cpp \
+    ../include/simLib/shared_memory.c \
+    ../include/simLib/simLib.cpp \
 
 HEADERS +=\
     simExtRemoteApi.h \
@@ -76,10 +77,10 @@ HEADERS +=\
     simxContainer.h \
     simxSocket.h \
     simxUtils.h \
-    ../include/scriptFunctionData.h \
-    ../include/scriptFunctionDataItem.h \
-    ../include/shared_memory.h \
-    ../include/simLib.h \
+    ../include/simLib/scriptFunctionData.h \
+    ../include/simLib/scriptFunctionDataItem.h \
+    ../include/simLib/shared_memory.h \
+    ../include/simLib/simLib.h \
 
 unix:!symbian {
     maemo5 {
