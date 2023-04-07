@@ -2,6 +2,7 @@
 #include "simxUtils.h"
 #include "simLib.h"
 
+
 CSimxContainer::CSimxContainer(bool isInputContainer)
 {
     _isInputContainer=isInputContainer;
@@ -203,17 +204,17 @@ void CSimxContainer::executeCommands(CSimxContainer* outputContainer,CSimxSocket
         if (simGetRealTimeSimulation()>0)
             serverState|=4;
         int editModeType;
-        simGetIntegerParameter(sim_intparam_edit_mode_type,&editModeType);
+        simGetInt32Param(sim_intparam_edit_mode_type,&editModeType);
         serverState|=(editModeType<<3);
         int sceneUniqueID;
-        simGetIntegerParameter(sim_intparam_scene_unique_id,&sceneUniqueID);
+        simGetInt32Param(sim_intparam_scene_unique_id,&sceneUniqueID);
         outputContainer->setSceneID(WORD(sceneUniqueID));
         outputContainer->setServerState(serverState);
 
         // Prepare for correct error reporting:
         int errorModeSaved;
-        simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
-        simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_report);
+        simGetInt32Param(sim_intparam_error_report_mode,&errorModeSaved);
+        simSetInt32Param(sim_intparam_error_report_mode,sim_api_errormessage_report);
         char* err=simGetLastError(); // just clear the last error
         if (err!=NULL)
             simReleaseBuffer(err);
@@ -227,7 +228,7 @@ void CSimxContainer::executeCommands(CSimxContainer* outputContainer,CSimxSocket
         }
 
         // Restore previous error report mode:
-        simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); 
+        simSetInt32Param(sim_intparam_error_report_mode,errorModeSaved);
 
         _removeNonContinuousCommands(); // simx_opmode_oneshot_split commands are also kept!
     }

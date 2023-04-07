@@ -20,8 +20,11 @@
     #define WIN_AFX_MANAGE_STATE
 #endif /* __linux || __APPLE__ */
 
+
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)    CONCAT(x,y,z)
+
+#import "simLib-old2.h"
 
 static LIBRARY simLib;
 static CSimxConnections allConnections;
@@ -367,7 +370,7 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer,int reservedInt)
     // Check if we need to start additional remote API server services:
     for (int iarg=0;iarg<9;iarg++)
     {
-        char* str=simGetStringParameter(sim_stringparam_app_arg1+iarg);
+        char* str=simGetStringParam(sim_stringparam_app_arg1+iarg);
         if (str!=NULL)
         {
             std::string arg(str);
@@ -443,8 +446,8 @@ SIM_DLLEXPORT void* simMessage(int message,int* auxiliaryData,void* customData,i
 
     // This function should not generate any error messages:
     int errorModeSaved;
-    simGetIntegerParameter(sim_intparam_error_report_mode,&errorModeSaved);
-    simSetIntegerParameter(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
+    simGetInt32Param(sim_intparam_error_report_mode,&errorModeSaved);
+    simSetInt32Param(sim_intparam_error_report_mode,sim_api_errormessage_ignore);
 
     void* retVal=NULL;
 
@@ -457,23 +460,23 @@ SIM_DLLEXPORT void* simMessage(int message,int* auxiliaryData,void* customData,i
     { // Main script is about to be run
         if (allConnections.thereWasARequestToCallTheMainScript())
         {
-            simSetBooleanParameter(sim_boolparam_waiting_for_trigger,1); // the remote API client can query that value
+            simSetBoolParam(sim_boolparam_waiting_for_trigger,1); // the remote API client can query that value
             replyData[0]=0; // this tells CoppeliaSim that we don't wanna execute the main script
         }
         else
         {
-            simSetBooleanParameter(sim_boolparam_waiting_for_trigger,0); // the remote API client can query that value
+            simSetBoolParam(sim_boolparam_waiting_for_trigger,0); // the remote API client can query that value
             allConnections.mainScriptWillBeCalled(); // this simply tells all remote API server services to reactivate their triggers (if that function is enabled)
         }
     }
 
     if (message==sim_message_eventcallback_simulationended)
     { // Simulation just ended
-        simSetBooleanParameter(sim_boolparam_waiting_for_trigger,0);
+        simSetBoolParam(sim_boolparam_waiting_for_trigger,0);
         allConnections.simulationEnded();
     }
 
-    simSetIntegerParameter(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
+    simSetInt32Param(sim_intparam_error_report_mode,errorModeSaved); // restore previous settings
     return(retVal);
 }
 

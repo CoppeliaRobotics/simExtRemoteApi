@@ -17,3 +17,6 @@ object_script.*.Debug
 object_script.*.Release
 debug/
 release/
+/.idea/
+/cmake-build-debug/
+/cmake-build-release/

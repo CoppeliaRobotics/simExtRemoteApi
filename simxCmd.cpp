@@ -4,6 +4,7 @@
 #include "simxSocket.h"
 #include "scriptFunctionData.h"
 #include <stdio.h>
+#import "simLib-old2.h"
 
 CSimxCmd::CSimxCmd(int commandID,WORD delayOrSplit,int dataSize,const char* dataPointer)
 {
@@ -492,7 +493,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_get_joint_position:
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float pos=0.0f;
+            double pos=0.0f;
             bool success=(simGetJointPosition(handle,&pos)!=-1);
             retCmd->setDataReply_1float(pos,success,otherSideIsBigEndian);
         }
@@ -501,7 +502,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_get_joint_matrix:
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float matrix[12];
+            double matrix[12];
             bool success=(simGetJointMatrix(handle,matrix)!=-1);
             if (success)
             {
@@ -515,9 +516,9 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_read_proximity_sensor:
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float detectedPoint[4];
+            double detectedPoint[4];
             int detectedObjectHandle;
-            float detectedSurfaceNormalVector[3];
+            double detectedSurfaceNormalVector[3];
             int res=simReadProximitySensor(handle,detectedPoint,&detectedObjectHandle,detectedSurfaceNormalVector);
             bool success=(res!=-1);
             char data[29];
@@ -554,17 +555,17 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
             std::string tmp(_cmdString);
             if (_cmdString.compare(0,20,"REMOTE_API_TEMPFILE_")==0)
             {
-                char* path=simGetStringParameter(sim_stringparam_remoteapi_temp_file_dir);
+                char* path=simGetStringParam(sim_stringparam_remoteapi_temp_file_dir);
                 tmp=path;
                 simReleaseBuffer(path);
                 tmp+="/";
                 tmp+=_cmdString;
             }
             simRemoveObjectFromSelection(sim_handle_all,-1);
-            int initValue=simGetBooleanParameter(sim_boolparam_scene_and_model_load_messages);
-            simSetBooleanParameter(sim_boolparam_scene_and_model_load_messages,0);
+            int initValue=simGetBoolParam(sim_boolparam_scene_and_model_load_messages);
+            simSetBoolParam(sim_boolparam_scene_and_model_load_messages,0);
             bool success=(simLoadModel(tmp.c_str())!=-1);
-            simSetBooleanParameter(sim_boolparam_scene_and_model_load_messages,initValue);
+            simSetBoolParam(sim_boolparam_scene_and_model_load_messages,initValue);
             int handle=simGetObjectLastSelection();
             retCmd->setDataReply_1int(handle,success,otherSideIsBigEndian);
         }
@@ -575,16 +576,16 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
             std::string tmp(_cmdString);
             if (_cmdString.compare(0,20,"REMOTE_API_TEMPFILE_")==0)
             {
-                char* path=simGetStringParameter(sim_stringparam_remoteapi_temp_file_dir);
+                char* path=simGetStringParam(sim_stringparam_remoteapi_temp_file_dir);
                 tmp=path;
                 simReleaseBuffer(path);
                 tmp+="/";
                 tmp+=_cmdString;
             }
-            int initValue=simGetBooleanParameter(sim_boolparam_scene_and_model_load_messages);
-            simSetBooleanParameter(sim_boolparam_scene_and_model_load_messages,0);
+            int initValue=simGetBoolParam(sim_boolparam_scene_and_model_load_messages);
+            simSetBoolParam(sim_boolparam_scene_and_model_load_messages,0);
             bool success=(simLoadScene(tmp.c_str())!=-1);
-            simSetBooleanParameter(sim_boolparam_scene_and_model_load_messages,initValue);
+            simSetBoolParam(sim_boolparam_scene_and_model_load_messages,initValue);
             retCmd->setDataReply_nothing(success);
         }
         break;
@@ -601,7 +602,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_set_spherical_joint_matrix:
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float matrix[12];
+            double matrix[12];
             for (int i=0;i<12;i++)
                 matrix[i]=littleEndianFloatConversion(((float*)_pureData)[i],otherSideIsBigEndian);
             bool success=(simSetSphericalJointMatrix(handle,matrix)!=-1);
@@ -684,7 +685,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int res[2];
             bool success=false;
-            if (simGetVisionSensorResolution(handle,res)!=-1)
+            if (simGetVisionSensorRes(handle,res)!=-1)
             {
                 int bytesPerPixel;
                 if(_rawCmdID == simx_cmd_get_vision_sensor_image_bw) {
@@ -728,7 +729,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int res[2];
             bool success=false;
-            if (simGetVisionSensorResolution(handle,res)!=-1)
+            if (simGetVisionSensorRes(handle,res)!=-1)
             {
                 int bytesPerPixel;
                 if(_rawCmdID == simx_cmd_set_vision_sensor_image_bw) {
@@ -765,7 +766,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_get_joint_force:
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float f=0.0f;
+            double f=0.0f;
             bool success=(simGetJointForce(handle,&f)!=-1);
             retCmd->setDataReply_1float(f,success,otherSideIsBigEndian);
         }
@@ -774,8 +775,8 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_get_joint_max_force:
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float f=0.0f;
-            bool success=(simGetJointMaxForce(handle,&f)!=-1);
+            double f=0.0f;
+            bool success=(simGetJointTargetForce(handle,&f)!=-1);
             retCmd->setDataReply_1float(f,success,otherSideIsBigEndian);
         }
         break;
@@ -792,8 +793,8 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_read_force_sensor:
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float forceV[3];
-            float torqueV[3];
+            double forceV[3];
+            double torqueV[3];
             int res=simReadForceSensor(handle,forceV,torqueV);
             char dat[25];
             dat[0]=0;
@@ -819,7 +820,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_read_vision_sensor:
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float* auxValues;
+            double* auxValues;
             int* auxValuesCount;
             int res=simReadVisionSensor(handle,&auxValues,&auxValuesCount);
             if (res>=0)
@@ -864,7 +865,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
 
         case simx_cmd_transfer_file:
         {
-            char* path=simGetStringParameter(sim_stringparam_remoteapi_temp_file_dir);
+            char* path=simGetStringParam(sim_stringparam_remoteapi_temp_file_dir);
             std::string tmp(path);
             simReleaseBuffer(path);
             tmp+="/";
@@ -882,7 +883,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
 
         case simx_cmd_erase_file:
         {
-            char* path=simGetStringParameter(sim_stringparam_remoteapi_temp_file_dir);
+            char* path=simGetStringParam(sim_stringparam_remoteapi_temp_file_dir);
             std::string tmp(path);
             simReleaseBuffer(path);
             tmp+="/";
@@ -897,7 +898,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
             std::string tmp(_cmdString);
             if (_cmdString.compare(0,20,"REMOTE_API_TEMPFILE_")==0)
             {
-                char* path=simGetStringParameter(sim_stringparam_remoteapi_temp_file_dir);
+                char* path=simGetStringParam(sim_stringparam_remoteapi_temp_file_dir);
                 tmp=path;
                 simReleaseBuffer(path);
                 tmp+="/";
@@ -1092,7 +1093,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         { // should not be used anymore, but kept for backward compatibility (10/6/2014)
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int relativeToObject=littleEndianIntConversion(((int*)(_pureData+0))[0],otherSideIsBigEndian);
-            float euler[3];
+            double euler[3];
             bool success=(simGetObjectOrientation(handle,relativeToObject,euler)!=-1);
             // Endian conversion on the client side!
             retCmd->setDataReply_custom_copyBuffer((char*)euler,4*3,success);
@@ -1103,7 +1104,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         { // should not be used anymore, but kept for backward compatibility (10/6/2014)
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int relativeToObject=littleEndianIntConversion(((int*)(_pureData+0))[0],otherSideIsBigEndian);
-            float pos[3];
+            double pos[3];
             bool success=(simGetObjectPosition(handle,relativeToObject,pos)!=-1);
             // Endian conversion on the client side!
             retCmd->setDataReply_custom_copyBuffer((char*)pos,4*3,success);
@@ -1114,7 +1115,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int relativeToObject=littleEndianIntConversion(((int*)(_cmdData+0))[1],otherSideIsBigEndian);
-            float euler[3];
+            double euler[3];
             bool success=(simGetObjectOrientation(handle,relativeToObject,euler)!=-1);
             // Endian conversion on the client side!
             retCmd->setDataReply_custom_copyBuffer((char*)euler,4*3,success);
@@ -1125,7 +1126,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int relativeToObject=littleEndianIntConversion(((int*)(_cmdData+0))[1],otherSideIsBigEndian);
-            float quat[4];
+            double quat[4];
             bool success=(simGetObjectQuaternion(handle,relativeToObject,quat)!=-1);
             // Endian conversion on the client side!
             retCmd->setDataReply_custom_copyBuffer((char*)quat,4*4,success);
@@ -1136,7 +1137,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int relativeToObject=littleEndianIntConversion(((int*)(_cmdData+0))[1],otherSideIsBigEndian);
-            float pos[3];
+            double pos[3];
             bool success=(simGetObjectPosition(handle,relativeToObject,pos)!=-1);
             // Endian conversion on the client side!
             retCmd->setDataReply_custom_copyBuffer((char*)pos,4*3,success);
@@ -1146,7 +1147,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_get_object_velocity:
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float data[6];
+            double data[6];
             bool success=(simGetObjectVelocity(handle,data,data+3)!=-1);
             // Endian conversion on the client side!
             retCmd->setDataReply_custom_copyBuffer((char*)data,4*6,success);
@@ -1157,7 +1158,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int relativeToObject=littleEndianIntConversion(((int*)(_pureData+0))[0],otherSideIsBigEndian);
-            float euler[3];
+            double euler[3];
             euler[0]=littleEndianFloatConversion(((float*)(_pureData+0))[1],otherSideIsBigEndian);
             euler[1]=littleEndianFloatConversion(((float*)(_pureData+0))[2],otherSideIsBigEndian);
             euler[2]=littleEndianFloatConversion(((float*)(_pureData+0))[3],otherSideIsBigEndian);
@@ -1170,7 +1171,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int relativeToObject=littleEndianIntConversion(((int*)(_pureData+0))[0],otherSideIsBigEndian);
-            float pos[3];
+            double pos[3];
             pos[0]=littleEndianFloatConversion(((float*)(_pureData+0))[1],otherSideIsBigEndian);
             pos[1]=littleEndianFloatConversion(((float*)(_pureData+0))[2],otherSideIsBigEndian);
             pos[2]=littleEndianFloatConversion(((float*)(_pureData+0))[3],otherSideIsBigEndian);
@@ -1183,7 +1184,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int relativeToObject=littleEndianIntConversion(((int*)(_pureData+0))[0],otherSideIsBigEndian);
-            float quat[4];
+            double quat[4];
             quat[0]=littleEndianFloatConversion(((float*)(_pureData+0))[1],otherSideIsBigEndian);
             quat[1]=littleEndianFloatConversion(((float*)(_pureData+0))[2],otherSideIsBigEndian);
             quat[2]=littleEndianFloatConversion(((float*)(_pureData+0))[3],otherSideIsBigEndian);
@@ -1304,7 +1305,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                     int w=-1; // abs
                     if (dataType==4)
                         w=sim_handle_parent; // rel
-                    float p[3];
+                    double p[3];
                     simGetObjectPosition(handle,w,p);
                     retFloat.push_back(p[0]);
                     retFloat.push_back(p[1]);
@@ -1315,7 +1316,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                     int w=-1; // abs
                     if (dataType==6)
                         w=sim_handle_parent; // rel
-                    float o[3];
+                    double o[3];
                     simGetObjectOrientation(handle,w,o);
                     retFloat.push_back(o[0]);
                     retFloat.push_back(o[1]);
@@ -1326,7 +1327,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                     int w=-1; // abs
                     if (dataType==8)
                         w=sim_handle_parent; // rel
-                    float q[4];
+                    double q[4];
                     simGetObjectQuaternion(handle,w,q);
                     retFloat.push_back(q[0]);
                     retFloat.push_back(q[1]);
@@ -1338,12 +1339,12 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                     int w=-1; // abs
                     if (dataType==10)
                         w=sim_handle_parent; // rel
-                    float p[3];
+                    double p[3];
                     simGetObjectPosition(handle,w,p);
                     retFloat.push_back(p[0]);
                     retFloat.push_back(p[1]);
                     retFloat.push_back(p[2]);
-                    float o[3];
+                    double o[3];
                     simGetObjectOrientation(handle,w,o);
                     retFloat.push_back(o[0]);
                     retFloat.push_back(o[1]);
@@ -1354,12 +1355,12 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                     int w=-1; // abs
                     if (dataType==12)
                         w=sim_handle_parent; // rel
-                    float p[3];
+                    double p[3];
                     simGetObjectPosition(handle,w,p);
                     retFloat.push_back(p[0]);
                     retFloat.push_back(p[1]);
                     retFloat.push_back(p[2]);
-                    float q[4];
+                    double q[4];
                     simGetObjectOrientation(handle,w,q);
                     retFloat.push_back(q[0]);
                     retFloat.push_back(q[1]);
@@ -1370,9 +1371,9 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                 { // prox sensor data
                     if (simGetObjectType(handle)==sim_object_proximitysensor_type)
                     {
-                        float pt[4];
+                        double pt[4];
                         int obj;
-                        float normal[3];
+                        double normal[3];
                         int res=simReadProximitySensor(handle,pt,&obj,normal);
                         retInt.push_back(res);
                         retInt.push_back(obj);
@@ -1399,8 +1400,8 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                 { // force sensor data
                     if (simGetObjectType(handle)==sim_object_forcesensor_type)
                     {
-                        float force[3];
-                        float torque[3];
+                        double force[3];
+                        double torque[3];
                         int res=simReadForceSensor(handle,force,torque);
                         retInt.push_back(res);
                         retFloat.push_back(force[0]);
@@ -1425,8 +1426,8 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                 { // joint data
                     if (simGetObjectType(handle)==sim_object_joint_type)
                     {
-                        float pos=0.0f;
-                        float force=0.0f;
+                        double pos=0.0f;
+                        double force=0.0f;
                         simGetJointPosition(handle,&pos);
                         simJointGetForce(handle,&force);
                         retFloat.push_back(pos);
@@ -1442,7 +1443,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                 { // joint type, mode and limit data
                     if (simGetObjectType(handle)==sim_object_joint_type)
                     {
-                        float range[2];
+                        double range[2];
                         bool cyclic;
                         simGetJointInterval(handle,&cyclic,range);
                         if (cyclic)
@@ -1467,7 +1468,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                 }
                 if (dataType==17)
                 { // object linear velocity
-                    float linVel[3];
+                    double linVel[3];
                     simGetObjectVelocity(handle,linVel,NULL);
                     retFloat.push_back(linVel[0]);
                     retFloat.push_back(linVel[1]);
@@ -1475,7 +1476,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                 }
                 if (dataType==18)
                 { // object angular velocity
-                    float angVel[3];
+                    double angVel[3];
                     simGetObjectVelocity(handle,NULL,angVel);
                     retFloat.push_back(angVel[0]);
                     retFloat.push_back(angVel[1]);
@@ -1483,8 +1484,8 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
                 }
                 if (dataType==19)
                 { // object linear and angular velocity (twist data)
-                    float linVel[3];
-                    float angVel[3];
+                    double linVel[3];
+                    double angVel[3];
                     simGetObjectVelocity(handle,linVel,angVel);
                     retFloat.push_back(linVel[0]);
                     retFloat.push_back(linVel[1]);
@@ -1616,7 +1617,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_get_array_parameter:
         {
             int parameterID=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float p[3];
+            double p[3];
             bool success=(simGetArrayParameter(parameterID,p)!=-1);
             if (success)
             {
@@ -1631,7 +1632,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_set_array_parameter:
         {
             int parameterID=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float p[3];
+            double p[3];
             p[0]=littleEndianFloatConversion(((float*)_pureData)[0],otherSideIsBigEndian);
             p[1]=littleEndianFloatConversion(((float*)_pureData)[1],otherSideIsBigEndian);
             p[2]=littleEndianFloatConversion(((float*)_pureData)[2],otherSideIsBigEndian);
@@ -1679,7 +1680,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_get_floating_parameter:
         {
             int parameterID=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float p;
+            double p;
             bool success=(simGetFloatingParameter(parameterID,&p)!=-1);
             retCmd->setDataReply_1float(p,success,otherSideIsBigEndian);
         }
@@ -1749,7 +1750,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         case simx_cmd_read_distance:
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
-            float dist=0.0f;
+            double dist=0.0f;
             bool success=(simReadDistance(handle,&dist)!=-1);
             retCmd->setDataReply_1float(dist,success,otherSideIsBigEndian);
         }
@@ -1769,7 +1770,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         {
             int entity1=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int entity2=littleEndianIntConversion(((int*)(_cmdData+0))[1],otherSideIsBigEndian);
-            float dist[7];
+            double dist[7];
             bool success=(simCheckDistance(entity1,entity2,0.0f,dist)!=-1);
             retCmd->setDataReply_1float(dist[6],success,otherSideIsBigEndian);
         }
@@ -1978,7 +1979,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
 
         case simx_cmd_get_float_signal:
         {
-            float signalValue;
+            double signalValue;
             int res=simGetFloatSignal(_cmdString.c_str(),&signalValue);
             retCmd->setDataReply_1float(signalValue,res>0,otherSideIsBigEndian);
         }
@@ -2080,7 +2081,7 @@ CSimxCmd* CSimxCmd::_executeCommand(CSimxSocket* sock,bool otherSideIsBigEndian)
         {
             int handle=littleEndianIntConversion(((int*)(_cmdData+0))[0],otherSideIsBigEndian);
             int paramID=littleEndianIntConversion(((int*)(_cmdData+0))[1],otherSideIsBigEndian);
-            float param;
+            double param;
             bool success=(simGetObjectFloatParameter(handle,paramID,&param)>0);
             retCmd->setDataReply_1float(param,success,otherSideIsBigEndian);
         }

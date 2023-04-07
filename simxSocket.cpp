@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 
+
 bool CSimxSocket::useAlternateSocketRoutines=false;
 
 
@@ -72,9 +73,9 @@ bool CSimxSocket::getWaitForTrigger()
 {
     // make sure we override the external trigger if the user presses stop:
     int ver;
-    simGetIntegerParameter(sim_intparam_program_version,&ver);
+    simGetInt32Param(sim_intparam_program_version,&ver);
     int req;
-    simGetIntegerParameter(sim_intparam_stop_request_counter,&req);
+    simGetInt32Param(sim_intparam_stop_request_counter,&req);
     if ((req!=_stopSimulationRequestCounter)&&(ver>=30006)) // stop in stepped mode only supported from CoppeliaSim 3.0.6 on!
     {
         _waitForTrigger=false;
@@ -90,7 +91,7 @@ void CSimxSocket::setWaitForTriggerEnabled(bool e)
         _waitForTriggerFunctionEnabled=e;
         _waitForTrigger=e;
         // initialize the stop request counter:
-        simGetIntegerParameter(sim_intparam_stop_request_counter,&_stopSimulationRequestCounter);
+        simGetInt32Param(sim_intparam_stop_request_counter,&_stopSimulationRequestCounter);
     }
 }
 
