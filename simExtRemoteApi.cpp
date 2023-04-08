@@ -81,18 +81,19 @@ void LUA_START_CALLBACK(SScriptCallBack* p)
         CSimxSocket* s=allConnections.getConnectionFromPort(port);
         if (s==NULL)
         {
-            int prop,obj;
-            if (-1!=simGetScriptProperty(p->scriptID,&prop,&obj))
-            {
-                int scriptType=((prop|sim_scripttype_threaded_old)-sim_scripttype_threaded_old);
+//            int prop,obj;
+//            if (-1!=simGetScriptInt32Param(p->scriptID,&prop,&obj))
+//            {
+                //int scriptType=((prop|sim_scripttype_threaded_old)-sim_scripttype_threaded_old);
+                int scriptType= sim_scripttype_childscript;
                 bool destroyAtSimulationEnd=( (scriptType==sim_scripttype_mainscript)||(scriptType==sim_scripttype_childscript) );
                 CSimxSocket* oneSocketConnection=new CSimxSocket(port,false,destroyAtSimulationEnd,debug,maxPacketSize,triggerPreEnabled); // 3/3/2014
                 oneSocketConnection->start();
                 allConnections.addSocketConnection(oneSocketConnection);
                 result=1;
-            }
-            else
-                simSetLastError(LUA_START_COMMAND,"Unknown error."); // output an error
+//            }
+//            else
+//                simSetLastError(LUA_START_COMMAND,"Unknown error."); // output an error
         }
         else
             simSetLastError(LUA_START_COMMAND,"Invalid port number."); // output an error
