@@ -1,6 +1,5 @@
 set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE INTERNAL "" FORCE)
 cmake_minimum_required(VERSION 3.15)
-set(CMAKE_OSX_ARCHITECTURES x86_64)
 
 project(simExtRemoteApi)
 
@@ -12,7 +11,7 @@ set(CMAKE_HAVE_THREADS_LIBRARY 1)
 set(CMAKE_USE_WIN32_THREADS_INIT 0)
 set(CMAKE_USE_PTHREADS_INIT 1)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
-set(CMAKE_OSX_SYSROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk")
+set(CMAKE_OSX_SYSROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk")
 set(Qt5_DIR "/opt/homebrew/Cellar/qt@5/5.15.8_2/lib/cmake/Qt5")
 set(COPPELIASIM_ROOT_DIR "/Applications/coppeliaSim.app/Contents/Resources")
 

@@ -24,7 +24,7 @@
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)    CONCAT(x,y,z)
 
-#import "simLib-old2.h"
+
 
 static LIBRARY simLib;
 static CSimxConnections allConnections;
